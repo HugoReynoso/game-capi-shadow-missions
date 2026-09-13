@@ -151,4 +151,3 @@ Per pubblicare alla radice di un altro dominio, modifica `base` in `vite.config.
 - [ ] Fase 3 — Missioni 06–10 e sblocco progressivo dei livelli implementati.
 - [ ] Fase 4 — Modelli realistici, animazioni, registrazioni audio, WebGPU, ottimizzazioni su dispositivi reali, spagnolo.
 - [ ] Fase 5 — Backend, account, classifiche e potenziamenti.
-

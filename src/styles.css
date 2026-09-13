@@ -9,4 +9,3 @@
 @media(min-width:1500px){.hero-art{background-size:cover;background-position:center}}
 @media(max-width:1000px){.hero-art{background-position:65% center}}
 @media(max-width:600px){.hero-art{background-image:linear-gradient(0deg,#09121c 0%,#09121ce8 32%,#09121c11 76%),url('/images/isa-docky-hero.webp');background-size:100% 100%,auto 75%;background-position:center,68% top;background-repeat:no-repeat;opacity:1}.chapter-label{margin-bottom:200px}.home-hero{min-height:625px}}
-

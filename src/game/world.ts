@@ -51,4 +51,3 @@ export function createWorld(canvas:HTMLCanvasElement,settings:Settings){
  function animate(time:number,scan:boolean){for(let i=0;i<npcs.length;i++){const n=npcs[i];if(!n.alive)continue;const movement=Math.sin(time*.32+i);n.root.position.x=n.origin.x+movement*(n.type==='TARGET'?1.5:.8);n.root.rotation.y=Math.sin(time*.4+i)*.25;n.animationState=Math.abs(movement)<.8?'walking':'idle';n.parts.forEach(p=>{p.renderOverlay=scan&&n.type==='TARGET';p.overlayColor=new Color3(.4,.9,.7);p.overlayAlpha=.32;});}}
  return {engine,scene,camera,npcs,animate};
 }
-
