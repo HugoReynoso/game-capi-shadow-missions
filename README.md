@@ -18,11 +18,12 @@ La campagna contiene **10 missioni giocabili**, sbloccate in sequenza. Dopo una 
 - Avversari con colori di fazione, corporatura più larga nelle prime missioni, cappelli da banda o equipaggiamento tattico, copertura del viso e armi. Gli obiettivi autorizzati hanno una fascia rossa; i civili hanno il casco giallo.
 - Mira tramite tocco, trascinamento, joystick o tastiera, zoom 1×–8×, sparo dal centro del mirino con raycasting e ostacoli solidi.
 - Corazze dalla missione 04: testa letale, due colpi al busto o tre agli arti. Pattuglie più rapide su percorsi più ampi, barriere, bunker e convogli in movimento.
-- Tre colpi per caricatore; ricarica di 15 secondi con munizioni di riserva illimitate nella demo. A caricatore vuoto la ricarica parte automaticamente: contatore visibile, sparo bloccato e tempo missione ancora attivo. La pausa congela entrambi i contatori.
+- Quattro colpi per caricatore; ricarica di 10 secondi con munizioni di riserva illimitate nella demo. A caricatore vuoto la ricarica parte automaticamente: contatore visibile, sparo bloccato e tempo missione ancora attivo. La pausa congela entrambi i contatori.
 - Respiro stabile per 4 secondi, riutilizzabile dopo 8 secondi dall'attivazione.
 - Docky Scan evidenzia tutti gli obiettivi per 5 secondi, con recupero di 30 secondi.
 - Neutralizza tutti gli obiettivi: da due a cinque, con pattuglie progressivamente più veloci. Colpire civili o guardie senza fascia causa la sconfitta.
 - Il tempo scende da 90 a 63 secondi: alla scadenza, allarme visivo, raffica nemica e sconfitta.
+- Barra vita del nemico mirato o colpito, con salute residua numerica e stato ferito/abbattuto.
 - Immagine dell’ultimo sparo con indicazione di colpo riuscito/mancato, impatti e caduta dei personaggi.
 - Musica di suspense originale sintetizzata con volume aumentato di circa 3,4 volte a parità di impostazione, pulsante MUSIC ON/OFF durante la partita, volumi separati nelle impostazioni e sparo con rumore, attacco e coda grave.
 - Pausa manuale e automatica quando la pagina passa in background.

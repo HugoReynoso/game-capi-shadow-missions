@@ -17,7 +17,7 @@ import '@babylonjs/loaders/glTF';
 
 export interface NPC {
   id:string;type:NPCType;root:TransformNode;parts:Mesh[];colliders:Mesh[];origin:Vector3;
-  health:number;alive:boolean;behavior:string;animationState:string;hitTime:number|null;
+  health:number;maxHealth:number;alive:boolean;behavior:string;animationState:string;hitTime:number|null;
   groups:AnimationGroup[];pose:AnimationGroup|null;modelLoaded:boolean;joints:Map<string,TransformNode>;
 }
 const definitions:Array<{id:string;type:NPCType;x:number;z:number}>=[
@@ -34,7 +34,7 @@ export function createCharacters(scene:Scene,shadow:ShadowGenerator|null,mission
   const npcs:NPC[]=definitions.map((source,index)=>{
     const d={...source,type:(index<mission.targets?'TARGET':source.type) as NPCType};d.x+=Math.sin(mission.id*1.7+index)*1.2;d.z+=mission.id%3;
     const root=new TransformNode(d.id,scene);root.position.set(d.x,0,d.z);
-    return {...d,root,parts:[],colliders:[],origin:root.position.clone(),health:d.type==='TARGET'?(mission.armored?160:80):80,alive:true,behavior:d.type==='TARGET'?'phone':'patrol',animationState:'idle',hitTime:null,groups:[],pose:null,modelLoaded:false,joints:new Map()};
+    return {...d,root,parts:[],colliders:[],origin:root.position.clone(),health:d.type==='TARGET'?(mission.armored?160:80):80,maxHealth:d.type==='TARGET'?(mission.armored?160:80):80,alive:true,behavior:d.type==='TARGET'?'phone':'patrol',animationState:'idle',hitTime:null,groups:[],pose:null,modelLoaded:false,joints:new Map()};
   });
   const yellow=new StandardMaterial('safety yellow',scene);yellow.diffuseColor=Color3.FromHexString('#efb735');yellow.specularColor=new Color3(.3,.3,.3);
   const phoneMat=new StandardMaterial('phone',scene);phoneMat.diffuseColor=new Color3(.018,.025,.03);

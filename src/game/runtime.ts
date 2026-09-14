@@ -3,20 +3,20 @@ import {Vector3} from '@babylonjs/core/Maths/math.vector';
 import {createWorld} from './world';
 import {AudioManager} from './audio';
 import {SniperAimController} from './aim';
-import {resultFor,hitOutcome,shotDamage,type MissionState,type MissionResult} from './rules';
+import {MAGAZINE_SIZE,RELOAD_SECONDS,resultFor,hitOutcome,shotDamage,type MissionState,type MissionResult} from './rules';
 import type {Settings} from '../services/save';
 
-export interface GameHUD {time:number;ammo:number;zoom:number;breath:number;scan:number;breathing:boolean;scanning:boolean;reloading:boolean;reloadSeconds:number;state:MissionState;fps:number;distance:number;heading:number;models:boolean;remaining:number;muted:boolean;exposed:boolean}
+export interface GameHUD {time:number;ammo:number;zoom:number;breath:number;scan:number;breathing:boolean;scanning:boolean;reloading:boolean;reloadSeconds:number;state:MissionState;fps:number;distance:number;heading:number;targetHealth:{id:string;number:number;current:number;max:number}|null;models:boolean;remaining:number;muted:boolean;exposed:boolean}
 export interface Commands {mute:()=>void;fire:()=>void;zoom:(d:number)=>void;reload:()=>void;breath:()=>void;scan:()=>void;pause:()=>void;stick:(x:number,y:number)=>void}
 interface Callbacks {hud:(hud:GameHUD)=>void;result:(result:MissionResult)=>void;flash:(flash:boolean)=>void;feedback:(feedback:'hit'|'miss'|'wounded'|null)=>void;snapshot:(image:string)=>void}
 
 export function createMissionRuntime(canvas:HTMLCanvasElement,settings:Settings,callbacks:Callbacks,mission:Mission){
-  let disposed=false;
+  let disposed=false;let lastTargetId:string|null=null;
   const world=createWorld(canvas,settings,mission);
   const {engine,scene,camera,animate}=world;
   const audio=new AudioManager(settings.music,settings.sfx);audio.start();
   let muted=false;let exposed=false;let enemyShots=0;let capture=false;
-  let state:MissionState='LOADING',time=0,ammo=3,shots=0,hits=0;
+  let state:MissionState='LOADING',time=0,ammo=MAGAZINE_SIZE,shots=0,hits=0;
   let reloadUntil=0,breathUntil=0,breathReady=0,scanUntil=0,scanReady=0,lastShot=-10,lastHUD=0;
   let cinematicTime=0,pendingResult:MissionResult|null=null;
   let flashTimer:ReturnType<typeof setTimeout>,feedbackTimer:ReturnType<typeof setTimeout>;
@@ -36,8 +36,10 @@ export function createMissionRuntime(canvas:HTMLCanvasElement,settings:Settings,
   }
   function update(){
     if(disposed)return;
-    const distance=state==='PLAYING'?pick()?.distance||0:0;
-    callbacks.hud({remaining:world.npcs.filter(n=>n.type==='TARGET'&&n.alive).length,muted,exposed,time:Math.max(0,mission.timeLimit-time),ammo,zoom:aim.zoom,breath:Math.ceil(Math.max(0,breathReady-time)),scan:Math.ceil(Math.max(0,scanReady-time)),breathing:time<breathUntil,scanning:time<scanUntil,reloading:reloadUntil>0,reloadSeconds:Math.ceil(Math.max(0,reloadUntil-time)),state,fps:Math.round(engine.getFps()),distance:Math.round(distance),heading:Math.round(270+camera.rotation.y*180/Math.PI),models:world.npcs.every(n=>n.modelLoaded)});
+    const contact=state==='PLAYING'?pick():null;const distance=contact?.distance||0;
+    const targets=world.npcs.filter(n=>n.type==='TARGET');const target=targets.find(n=>n.id===contact?.pickedMesh?.metadata?.npcId)||targets.find(n=>n.id===lastTargetId);
+    const targetHealth=target?{id:target.id,number:targets.indexOf(target)+1,current:Math.max(0,target.health),max:target.maxHealth}:null;
+    callbacks.hud({targetHealth,remaining:world.npcs.filter(n=>n.type==='TARGET'&&n.alive).length,muted,exposed,time:Math.max(0,mission.timeLimit-time),ammo,zoom:aim.zoom,breath:Math.ceil(Math.max(0,breathReady-time)),scan:Math.ceil(Math.max(0,scanReady-time)),breathing:time<breathUntil,scanning:time<scanUntil,reloading:reloadUntil>0,reloadSeconds:Math.ceil(Math.max(0,reloadUntil-time)),state,fps:Math.round(engine.getFps()),distance:Math.round(distance),heading:Math.round(270+camera.rotation.y*180/Math.PI),models:world.npcs.every(n=>n.modelLoaded)});
   }
   function fire(){
     if(state!=='PLAYING'||ammo<=0||reloadUntil||time-lastShot<.65)return;
@@ -48,13 +50,13 @@ export function createMissionRuntime(canvas:HTMLCanvasElement,settings:Settings,
     const damage=shotDamage(contact?.pickedMesh?.metadata?.zone);
     const wounded=!!npc&&npc.type==='TARGET'&&npc.health>damage;
     callbacks.feedback(wounded?'wounded':npc?'hit':'miss');clearTimeout(feedbackTimer);feedbackTimer=setTimeout(()=>!disposed&&callbacks.feedback(null),1600);
-    if(npc&&npc.alive){hits++;if(npc.type==='TARGET'){npc.health-=damage;if(npc.health<=0){world.hit(npc,time);if(world.npcs.every(n=>n.type!=='TARGET'||!n.alive))finish('target');}}else{world.hit(npc,time);finish(hitOutcome(npc.type));}}
+    if(npc&&npc.alive){hits++;if(npc.type==='TARGET'){lastTargetId=npc.id;npc.health-=damage;if(npc.health<=0){world.hit(npc,time);if(world.npcs.every(n=>n.type!=='TARGET'||!n.alive))finish('target');}}else{world.hit(npc,time);finish(hitOutcome(npc.type));}}
     else if(contact?.pickedPoint)world.impact(contact.pickedPoint);
     if(ammo===0&&state==='PLAYING')reload();
     if(!settings.reducedShake)aim.kick();update();
   }
   function zoom(d:number){if(state==='PLAYING')aim.setZoom(aim.zoom+d);}
-  function reload(){if(state!=='PLAYING'||ammo===3||reloadUntil)return;reloadUntil=time+15;audio.play('reload');update();}
+  function reload(){if(state!=='PLAYING'||ammo===MAGAZINE_SIZE||reloadUntil)return;reloadUntil=time+RELOAD_SECONDS;audio.play('reload');update();}
   function breath(){if(state!=='PLAYING'||time<breathReady)return;breathUntil=time+4;breathReady=time+8;audio.play('breath');update();}
   function scan(){if(state!=='PLAYING'||time<scanReady)return;scanUntil=time+5;scanReady=time+30;audio.play('scan');update();}
   const commands:Commands={mute:()=>{muted=!muted;audio.setMuted(muted);update();},fire,zoom,reload,breath,scan,pause,stick:(x,y)=>{if(state==='PLAYING')aim.setStick(x,y);}};
@@ -70,7 +72,7 @@ export function createMissionRuntime(canvas:HTMLCanvasElement,settings:Settings,
   engine.runRenderLoop(()=>{
     const dt=Math.min(engine.getDeltaTime()/1000,.1);
     if(state==='PLAYING'){
-      time+=dt;if(reloadUntil&&time>=reloadUntil){ammo=3;reloadUntil=0;}
+      time+=dt;if(reloadUntil&&time>=reloadUntil){ammo=MAGAZINE_SIZE;reloadUntil=0;}
       aim.update(dt,time,time<breathUntil,settings.reducedShake);animate(time,time<scanUntil);
       if(time>=mission.timeLimit)finish('timeout');
     }else if(pendingResult){

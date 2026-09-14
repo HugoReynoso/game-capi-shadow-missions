@@ -1,3 +1,5 @@
+export const MAGAZINE_SIZE=4;
+export const RELOAD_SECONDS=10;
 export type NPCType = 'TARGET'|'HOSTILE'|'CIVILIAN';
 export type MissionState = 'LOADING'|'PLAYING'|'PAUSED'|'SUCCESS'|'FAILED';
 export interface MissionResult {success:boolean; reason:'target'|'civilian'|'wrong'|'timeout'; time:number; shots:number; hits:number; accuracy:number; stars:number; reward:number}
