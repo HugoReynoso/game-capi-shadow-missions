@@ -7,3 +7,5 @@ export function resultFor(reason:MissionResult['reason'],time:number,shots:numbe
  return {success,reason,time,shots,hits,accuracy,stars,reward:success?1000:0};
 }
 export function hitOutcome(type:NPCType):MissionResult['reason'] {return type==='TARGET'?'target':type==='CIVILIAN'?'civilian':'wrong';}
+
+export function shotDamage(zone:string|undefined):number {return zone==='head'?200:zone==='body'?85:55;}

@@ -17,13 +17,14 @@ La campagna contiene **10 missioni giocabili**, sbloccate in sequenza. Dopo una 
 - Porto procedurale con nave, gru, container, casse, magazzino e cinque personaggi animati, con modelli umani GLB, volti e abiti texturizzati.
 - Avversari con colori di fazione, corporatura più larga nelle prime missioni, cappelli da banda o equipaggiamento tattico, copertura del viso e armi. Gli obiettivi autorizzati hanno una fascia rossa; i civili hanno il casco giallo.
 - Mira tramite tocco, trascinamento, joystick o tastiera, zoom 1×–8×, sparo dal centro del mirino con raycasting e ostacoli solidi.
-- Tre colpi per caricatore; ricarica di 1,8 secondi con munizioni di riserva illimitate nella demo.
+- Corazze dalla missione 04: testa letale, due colpi al busto o tre agli arti. Pattuglie più rapide su percorsi più ampi, barriere, bunker e convogli in movimento.
+- Tre colpi per caricatore; ricarica di 15 secondi con munizioni di riserva illimitate nella demo. A caricatore vuoto la ricarica parte automaticamente: contatore visibile, sparo bloccato e tempo missione ancora attivo. La pausa congela entrambi i contatori.
 - Respiro stabile per 4 secondi, riutilizzabile dopo 8 secondi dall'attivazione.
 - Docky Scan evidenzia tutti gli obiettivi per 5 secondi, con recupero di 30 secondi.
-- Neutralizza tutti gli obiettivi: da uno a tre, con pattuglie progressivamente più veloci. Colpire civili o guardie senza fascia causa la sconfitta.
-- Il tempo scende da 90 a 45 secondi: alla scadenza, allarme visivo, raffica nemica e sconfitta.
+- Neutralizza tutti gli obiettivi: da due a cinque, con pattuglie progressivamente più veloci. Colpire civili o guardie senza fascia causa la sconfitta.
+- Il tempo scende da 90 a 63 secondi: alla scadenza, allarme visivo, raffica nemica e sconfitta.
 - Immagine dell’ultimo sparo con indicazione di colpo riuscito/mancato, impatti e caduta dei personaggi.
-- Musica di suspense originale sintetizzata, pulsante MUSIC ON/OFF durante la partita, volumi separati nelle impostazioni e sparo con rumore, attacco e coda grave.
+- Musica di suspense originale sintetizzata con volume aumentato di circa 3,4 volte a parità di impostazione, pulsante MUSIC ON/OFF durante la partita, volumi separati nelle impostazioni e sparo con rumore, attacco e coda grave.
 - Pausa manuale e automatica quando la pagina passa in background.
 - Stelle, miglior tempo, miglior precisione, crediti e impostazioni persistenti in localStorage, con recupero da dati corrotti.
 - Equipaggiamento, dossier con le fotografie di riferimento, impostazioni, italiano e inglese.

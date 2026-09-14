@@ -80,11 +80,16 @@ export function createWorld(canvas:HTMLCanvasElement,settings:Settings,mission:M
  }
  scene.fogDensity=mission.id===8?.018:.006+mission.id*.0004;
  sky.diffuse=Color3.FromHexString(mission.environment==='city'?'#b7c3e8':mission.environment==='industrial'?'#d4bb92':'#9bc2e8');
+ const transports=scene.meshes.filter(m=>m.name.startsWith('transport'));const transportOrigins=transports.map(m=>m.position.z);
+ if([2,4,5,6,9,10].includes(mission.id)){
+   for(const [x,z] of [[-11,8],[5,16],[13,13]]){box('checkpoint barrier',x,.55,z,2.8,1.1,.65,'#4b4b42');box('barrier stripe',x,.7,z-.34,2.6,.18,.03,'#b29249');}
+ }
+ if(mission.id>=6){for(const x of [-17,18]){box('sentry bunker',x,1.1,23,3,2.2,2,'#343a36');box('bunker slit',x,1.5,21.98,2,.3,.05,'#090f10');}}
  const characters=createCharacters(scene,shadow,mission);
  const sparks=Array.from({length:8},(_,i)=>{const m=CreateSphere('impact '+i,{diameter:.09,segments:6},scene);m.material=material('#f4d5a2',true);m.isPickable=false;m.setEnabled(false);return {mesh:m,life:0};});
  let impactIndex=0;
  function impact(point:Vector3){const p=sparks[impactIndex++%sparks.length];p.mesh.position.copyFrom(point);p.life=.3;p.mesh.setEnabled(true);}
  let lastTime=0;
- function animate(time:number,scan:boolean){const dt=Math.max(0,time-lastTime);lastTime=time;characters.animate(time,scan);water.update(time,camera.position);for(const p of sparks){if(p.life>0){p.life-=dt;p.mesh.scaling.setAll(1+(.3-p.life)*8);p.mesh.visibility=Math.max(0,p.life/.3);if(p.life<=0)p.mesh.setEnabled(false);}}}
+ function animate(time:number,scan:boolean){const dt=Math.max(0,time-lastTime);lastTime=time;characters.animate(time,scan);transports.forEach((m,i)=>m.position.z=transportOrigins[i]+Math.sin(time*.24)*5);water.update(time,camera.position);for(const p of sparks){if(p.life>0){p.life-=dt;p.mesh.scaling.setAll(1+(.3-p.life)*8);p.mesh.visibility=Math.max(0,p.life/.3);if(p.life<=0)p.mesh.setEnabled(false);}}}
  return {engine,scene,camera,npcs:characters.npcs,animate,ready:characters.ready,hit:characters.hit,impact};
 }

@@ -24,6 +24,8 @@ const definitions:Array<{id:string;type:NPCType;x:number;z:number}>=[
   {id:'coordinator',type:'TARGET',x:-1,z:9},
   {id:'guard-west',type:'HOSTILE',x:-9,z:11},
   {id:'guard-east',type:'HOSTILE',x:7,z:12},
+  {id:'guard-rear',type:'HOSTILE',x:-13,z:17},
+  {id:'guard-command',type:'HOSTILE',x:3,z:18},
   {id:'worker-west',type:'CIVILIAN',x:-6,z:6},
   {id:'worker-east',type:'CIVILIAN',x:8,z:5},
 ];
@@ -32,7 +34,7 @@ export function createCharacters(scene:Scene,shadow:ShadowGenerator|null,mission
   const npcs:NPC[]=definitions.map((source,index)=>{
     const d={...source,type:(index<mission.targets?'TARGET':source.type) as NPCType};d.x+=Math.sin(mission.id*1.7+index)*1.2;d.z+=mission.id%3;
     const root=new TransformNode(d.id,scene);root.position.set(d.x,0,d.z);
-    return {...d,root,parts:[],colliders:[],origin:root.position.clone(),health:100,alive:true,behavior:d.type==='TARGET'?'phone':'patrol',animationState:'idle',hitTime:null,groups:[],pose:null,modelLoaded:false,joints:new Map()};
+    return {...d,root,parts:[],colliders:[],origin:root.position.clone(),health:d.type==='TARGET'?(mission.armored?160:80):80,alive:true,behavior:d.type==='TARGET'?'phone':'patrol',animationState:'idle',hitTime:null,groups:[],pose:null,modelLoaded:false,joints:new Map()};
   });
   const yellow=new StandardMaterial('safety yellow',scene);yellow.diffuseColor=Color3.FromHexString('#efb735');yellow.specularColor=new Color3(.3,.3,.3);
   const phoneMat=new StandardMaterial('phone',scene);phoneMat.diffuseColor=new Color3(.018,.025,.03);
@@ -76,7 +78,7 @@ export function createCharacters(scene:Scene,shadow:ShadowGenerator|null,mission
       if(n.type==='TARGET'){
         const hand=joint('RightHand');if(hand){const phone=CreateBox('phone',{width:.07*unit,height:.13*unit,depth:.012*unit},scene);phone.parent=hand;phone.position.set(0,.07*unit,.03*unit);phone.material=phoneMat;phone.isPickable=false;n.parts.push(phone);const screen=CreateBox('phone display',{width:.06*unit,height:.11*unit,depth:.001*unit},scene);screen.parent=phone;screen.position.z=-.007*unit;screen.material=screenMat;screen.isPickable=false;n.parts.push(screen);}
       }
-      if(n.type==='HOSTILE'||(n.type==='TARGET'&&mission.id>1)){
+      if(n.type!=='CIVILIAN'){
         const hand=joint('RightHand');
         if(hand){const rifle=CreateBox('rifle receiver',{width:.09*unit,height:.13*unit,depth:.42*unit},scene);rifle.parent=hand;rifle.position.set(0,.05*unit,.12*unit);rifle.material=phoneMat;rifle.isPickable=false;n.parts.push(rifle);
         for(const [name,w,h,d,z,y] of [['barrel',.035,.035,.32,.36,0],['stock',.07,.12,.22,-.25,0],['magazine',.06,.18,.08,.04,-.12]] as const){const part=CreateBox(name,{width:w*unit,height:h*unit,depth:d*unit},scene);part.parent=rifle;part.position.set(0,y*unit,z*unit);part.material=phoneMat;part.isPickable=false;n.parts.push(part);}}
@@ -85,7 +87,12 @@ export function createCharacters(scene:Scene,shadow:ShadowGenerator|null,mission
         const red=new StandardMaterial(n.id+' identification',scene);red.diffuseColor=Color3.FromHexString('#ff2535');red.emissiveColor=new Color3(.25,0,0);
         const band=CreateCapsule('red armband',{height:.13*unit,radius:.09*unit,tessellation:12},scene);band.parent=joint('LeftArm')||n.root;band.position.y=.14*unit;band.material=red;band.isPickable=false;n.parts.push(band);
         if(mission.id===2||mission.id===4){const cap=CreateSphere('gang cap',{diameter:.28*unit,segments:12},scene);cap.parent=joint('Head')||n.root;cap.position.y=.19*unit;cap.scaling.y=.45;cap.material=phoneMat;cap.isPickable=false;n.parts.push(cap);}
-        if(mission.id>=5){const mask=CreateSphere('face covering',{diameter:.24*unit,segments:12},scene);mask.parent=joint('Head')||n.root;mask.position.set(0,.03*unit,.035*unit);mask.scaling.y=.45;mask.material=phoneMat;mask.isPickable=false;n.parts.push(mask);}
+        if(mission.id>=3){const mask=CreateSphere('face covering',{diameter:.24*unit,segments:12},scene);mask.parent=joint('Head')||n.root;mask.position.set(0,.03*unit,.035*unit);mask.scaling.y=.45;mask.material=phoneMat;mask.isPickable=false;n.parts.push(mask);}
+      }
+      if(n.type==='TARGET'){
+        const vest=new StandardMaterial(n.id+' tactical vest',scene);vest.diffuseColor=Color3.FromHexString(mission.armored?'#24272a':'#39322e');vest.specularColor=new Color3(.1,.1,.1);
+        const chest=joint('Spine1');if(chest){const plate=CreateBox('armored chest',{width:.43*unit,height:.42*unit,depth:.26*unit},scene);plate.parent=chest;plate.position.set(0,.02*unit,0);plate.material=vest;plate.isPickable=false;n.parts.push(plate);for(const x of [-.14,0,.14]){const pouch=CreateBox('magazine pouch',{width:.105*unit,height:.17*unit,depth:.07*unit},scene);pouch.parent=plate;pouch.position.set(x*unit,-.07*unit,.15*unit);pouch.material=phoneMat;pouch.isPickable=false;n.parts.push(pouch);}}
+        const head=joint('Head');if(head){const glasses=CreateBox('dark tactical glasses',{width:.23*unit,height:.045*unit,depth:.065*unit},scene);glasses.parent=head;glasses.position.set(0,.13*unit,.105*unit);glasses.material=phoneMat;glasses.isPickable=false;n.parts.push(glasses);}
       }
       n.modelLoaded=true;
       n.parts.forEach(m=>shadow?.addShadowCaster(m,false));
@@ -103,11 +110,12 @@ export function createCharacters(scene:Scene,shadow:ShadowGenerator|null,mission
         const elapsed=Math.max(0,time-(n.hitTime??time));const amount=Math.min(1,elapsed/.65);
         n.root.rotation.z=-amount*1.45;n.root.position.y=-.15*amount;return;
       }
-      const phase=(time*mission.speed+i*3.7)%18;
-      const walking=phase<6||phase>=12;
-      const progress=phase<6?phase/6:phase<12?1:1-(phase-12)/6;
-      const travel=n.type==='TARGET'?1.8:2.2;
+      const phase=(time*mission.speed+i*3.7)%14;
+      const walking=phase<6||phase>=7;
+      const progress=phase<6?phase/6:phase<7?1:1-(phase-7)/7;
+      const travel=n.type==='TARGET'?4.5+mission.id*.15:3.2;
       n.root.position.x=n.origin.x+progress*travel-travel/2;
+      n.root.position.z=n.origin.z+Math.sin(time*mission.speed*.45+i)*1.2;
       const angle=walking?(phase<6?-Math.PI/2:Math.PI/2):Math.PI;
       // Blend orientation along the shortest arc, including at patrol turnarounds.
       const delta=Math.atan2(Math.sin(angle-n.root.rotation.y),Math.cos(angle-n.root.rotation.y));

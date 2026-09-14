@@ -4,11 +4,11 @@ export class AudioManager {
  private timer:ReturnType<typeof setInterval>|null=null;
  private step=0;private muted=false;
  constructor(private music:number,private sfx:number){}
- start(){try{if(this.context){void this.context.resume();return;}const c=this.context=new AudioContext();void c.resume();this.musicGain=c.createGain();this.musicGain.gain.value=this.music*.22;this.musicGain.connect(c.destination);
+ start(){try{if(this.context){void this.context.resume();return;}const c=this.context=new AudioContext();void c.resume();this.musicGain=c.createGain();this.musicGain.gain.value=this.music*.75;this.musicGain.connect(c.destination);
  const sequence=[55,55,65.41,55,58.27,55,73.42,65.41];
- this.timer=setInterval(()=>{if(c.state!=='running')return;const t=c.currentTime;const note=sequence[this.step++%sequence.length];for(const [frequency,volume,duration] of [[note,.28,.65],[note*2.01,.035,1.1],[note*3,.018,.9]]){const o=c.createOscillator(),g=c.createGain();o.type='triangle';o.frequency.value=frequency;g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(volume,t+.035);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(g).connect(this.musicGain!);o.start(t);o.stop(t+duration+.02);o.onended=()=>{o.disconnect();g.disconnect();};}},420);
+ this.timer=setInterval(()=>{if(c.state!=='running')return;const t=c.currentTime;const note=sequence[this.step++%sequence.length];for(const [frequency,volume,duration] of [[note,.28,.65],[note*2.01,.09,1.1],[note*3,.055,.9]]){const o=c.createOscillator(),g=c.createGain();o.type='triangle';o.frequency.value=frequency;g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(volume,t+.035);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(g).connect(this.musicGain!);o.start(t);o.stop(t+duration+.02);o.onended=()=>{o.disconnect();g.disconnect();};}},420);
  }catch{}}
- setMuted(muted:boolean){this.muted=muted;if(this.context&&this.musicGain)this.musicGain.gain.setTargetAtTime(muted?0:this.music*.22,this.context.currentTime,.03);}
+ setMuted(muted:boolean){this.muted=muted;if(this.context&&this.musicGain)this.musicGain.gain.setTargetAtTime(muted?0:this.music*.75,this.context.currentTime,.03);}
  play(kind:'shot'|'reload'|'scan'|'breath'|'success'|'failed') {try{this.start();const c=this.context!,t=c.currentTime;
  if(kind==='shot'){
  const buffer=c.createBuffer(1,c.sampleRate*.65,c.sampleRate),data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.exp(-i/(c.sampleRate*.09));

@@ -3,12 +3,12 @@ import {Vector3} from '@babylonjs/core/Maths/math.vector';
 import {createWorld} from './world';
 import {AudioManager} from './audio';
 import {SniperAimController} from './aim';
-import {resultFor,hitOutcome,type MissionState,type MissionResult} from './rules';
+import {resultFor,hitOutcome,shotDamage,type MissionState,type MissionResult} from './rules';
 import type {Settings} from '../services/save';
 
-export interface GameHUD {time:number;ammo:number;zoom:number;breath:number;scan:number;breathing:boolean;scanning:boolean;reloading:boolean;state:MissionState;fps:number;distance:number;heading:number;models:boolean;remaining:number;muted:boolean;exposed:boolean}
+export interface GameHUD {time:number;ammo:number;zoom:number;breath:number;scan:number;breathing:boolean;scanning:boolean;reloading:boolean;reloadSeconds:number;state:MissionState;fps:number;distance:number;heading:number;models:boolean;remaining:number;muted:boolean;exposed:boolean}
 export interface Commands {mute:()=>void;fire:()=>void;zoom:(d:number)=>void;reload:()=>void;breath:()=>void;scan:()=>void;pause:()=>void;stick:(x:number,y:number)=>void}
-interface Callbacks {hud:(hud:GameHUD)=>void;result:(result:MissionResult)=>void;flash:(flash:boolean)=>void;feedback:(feedback:'hit'|'miss'|null)=>void;snapshot:(image:string)=>void}
+interface Callbacks {hud:(hud:GameHUD)=>void;result:(result:MissionResult)=>void;flash:(flash:boolean)=>void;feedback:(feedback:'hit'|'miss'|'wounded'|null)=>void;snapshot:(image:string)=>void}
 
 export function createMissionRuntime(canvas:HTMLCanvasElement,settings:Settings,callbacks:Callbacks,mission:Mission){
   let disposed=false;
@@ -37,7 +37,7 @@ export function createMissionRuntime(canvas:HTMLCanvasElement,settings:Settings,
   function update(){
     if(disposed)return;
     const distance=state==='PLAYING'?pick()?.distance||0:0;
-    callbacks.hud({remaining:world.npcs.filter(n=>n.type==='TARGET'&&n.alive).length,muted,exposed,time:Math.max(0,mission.timeLimit-time),ammo,zoom:aim.zoom,breath:Math.ceil(Math.max(0,breathReady-time)),scan:Math.ceil(Math.max(0,scanReady-time)),breathing:time<breathUntil,scanning:time<scanUntil,reloading:reloadUntil>0,state,fps:Math.round(engine.getFps()),distance:Math.round(distance),heading:Math.round(270+camera.rotation.y*180/Math.PI),models:world.npcs.every(n=>n.modelLoaded)});
+    callbacks.hud({remaining:world.npcs.filter(n=>n.type==='TARGET'&&n.alive).length,muted,exposed,time:Math.max(0,mission.timeLimit-time),ammo,zoom:aim.zoom,breath:Math.ceil(Math.max(0,breathReady-time)),scan:Math.ceil(Math.max(0,scanReady-time)),breathing:time<breathUntil,scanning:time<scanUntil,reloading:reloadUntil>0,reloadSeconds:Math.ceil(Math.max(0,reloadUntil-time)),state,fps:Math.round(engine.getFps()),distance:Math.round(distance),heading:Math.round(270+camera.rotation.y*180/Math.PI),models:world.npcs.every(n=>n.modelLoaded)});
   }
   function fire(){
     if(state!=='PLAYING'||ammo<=0||reloadUntil||time-lastShot<.65)return;
@@ -45,13 +45,16 @@ export function createMissionRuntime(canvas:HTMLCanvasElement,settings:Settings,
     if(settings.vibration)navigator.vibrate?.(35);
     callbacks.flash(true);clearTimeout(flashTimer);flashTimer=setTimeout(()=>!disposed&&callbacks.flash(false),110);
     const contact=pick();const npc=world.npcs.find(n=>n.id===contact?.pickedMesh?.metadata?.npcId);
-    callbacks.feedback(npc?'hit':'miss');clearTimeout(feedbackTimer);feedbackTimer=setTimeout(()=>!disposed&&callbacks.feedback(null),1600);
-    if(npc&&npc.alive){hits++;world.hit(npc,time);if(npc.type!=='TARGET')finish(hitOutcome(npc.type));else if(world.npcs.every(n=>n.type!=='TARGET'||!n.alive))finish('target');}
+    const damage=shotDamage(contact?.pickedMesh?.metadata?.zone);
+    const wounded=!!npc&&npc.type==='TARGET'&&npc.health>damage;
+    callbacks.feedback(wounded?'wounded':npc?'hit':'miss');clearTimeout(feedbackTimer);feedbackTimer=setTimeout(()=>!disposed&&callbacks.feedback(null),1600);
+    if(npc&&npc.alive){hits++;if(npc.type==='TARGET'){npc.health-=damage;if(npc.health<=0){world.hit(npc,time);if(world.npcs.every(n=>n.type!=='TARGET'||!n.alive))finish('target');}}else{world.hit(npc,time);finish(hitOutcome(npc.type));}}
     else if(contact?.pickedPoint)world.impact(contact.pickedPoint);
+    if(ammo===0&&state==='PLAYING')reload();
     if(!settings.reducedShake)aim.kick();update();
   }
   function zoom(d:number){if(state==='PLAYING')aim.setZoom(aim.zoom+d);}
-  function reload(){if(state!=='PLAYING'||ammo===3||reloadUntil)return;reloadUntil=time+1.8;audio.play('reload');update();}
+  function reload(){if(state!=='PLAYING'||ammo===3||reloadUntil)return;reloadUntil=time+15;audio.play('reload');update();}
   function breath(){if(state!=='PLAYING'||time<breathReady)return;breathUntil=time+4;breathReady=time+8;audio.play('breath');update();}
   function scan(){if(state!=='PLAYING'||time<scanReady)return;scanUntil=time+5;scanReady=time+30;audio.play('scan');update();}
   const commands:Commands={mute:()=>{muted=!muted;audio.setMuted(muted);update();},fire,zoom,reload,breath,scan,pause,stick:(x,y)=>{if(state==='PLAYING')aim.setStick(x,y);}};
@@ -83,7 +86,7 @@ export function createMissionRuntime(canvas:HTMLCanvasElement,settings:Settings,
   if(import.meta.env.DEV){
     Object.assign(window,{__capiDebug:{world,aim,expire:()=>{time=mission.timeLimit;},aimAt:(id:string)=>{
       const n=world.npcs.find(n=>n.id===id);if(n){camera.setTarget(n.root.position.add(new Vector3(0,1.35,0)));aim.yaw=camera.rotation.y;aim.pitch=camera.rotation.x;}
-    },state:()=>({state,time,shots,ammo}),pick:()=>{const p=pick();return {name:p?.pickedMesh?.name,metadata:p?.pickedMesh?.metadata,distance:p?.distance};}}});
+    },state:()=>({state,time,shots,ammo,reloadUntil}),pick:()=>{const p=pick();return {name:p?.pickedMesh?.name,metadata:p?.pickedMesh?.metadata,distance:p?.distance};}}});
   }
   function dispose(){
     disposed=true;clearTimeout(flashTimer);clearTimeout(feedbackTimer);aim.dispose();
