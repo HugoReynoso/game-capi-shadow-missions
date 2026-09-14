@@ -9,3 +9,30 @@
 @media(min-width:1500px){.hero-art{background-size:cover;background-position:center}}
 @media(max-width:1000px){.hero-art{background-position:65% center}}
 @media(max-width:600px){.hero-art{background-image:linear-gradient(0deg,#09121c 0%,#09121ce8 32%,#09121c11 76%),url('/images/isa-docky-hero.webp');background-size:100% 100%,auto 75%;background-position:center,68% top;background-repeat:no-repeat;opacity:1}.chapter-label{margin-bottom:200px}.home-hero{min-height:625px}}
+/* Precision controls: keep the thumb pad separate from ability buttons. */
+.aim-control{position:absolute;bottom:max(30px,env(safe-area-inset-bottom));left:max(30px,env(safe-area-inset-left));z-index:2}
+.aim-joystick{width:108px;height:108px;position:relative;display:grid;place-items:center;touch-action:none;user-select:none;border:1px solid #9bb0bd55;border-radius:50%;background:radial-gradient(circle,#162d3bb0,#07151ac9);box-shadow:0 3px 20px #0004}
+.joystick-rings{position:absolute;inset:12px;border:1px dashed #9aaeb233;border-radius:50%}
+.joystick-thumb{width:47px;height:47px;border-radius:50%;display:grid;place-items:center;background:#50636e99;border:1px solid #b2c0c977;color:#dce8ec;pointer-events:none}
+.aim-joystick>span{position:absolute;bottom:-19px;font-size:9px;letter-spacing:2px;color:#afbec4;pointer-events:none}
+.game .utility{left:max(158px,calc(env(safe-area-inset-left) + 128px));bottom:max(30px,env(safe-area-inset-bottom));gap:8px}
+.game .utility button{width:72px;height:70px}
+.game .game-hint{bottom:25px;width:min(38%,530px)}
+.scope-info small{display:block;margin-top:8px;text-align:center;font-size:11px;letter-spacing:1px;color:#adc7cd}
+.shot-feedback{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;justify-items:center;color:#e9dfb4;pointer-events:none}
+.shot-feedback span{position:absolute;top:45px;white-space:nowrap;font-size:10px;letter-spacing:2px;text-shadow:0 1px 6px #000}
+.shot-feedback.miss{color:#c9d5dc}.shot-feedback.miss svg{display:none}
+.game.left-handed .aim-control{left:auto;right:max(30px,env(safe-area-inset-right))}
+.game.left-handed .utility{left:auto;right:max(158px,calc(env(safe-area-inset-right) + 128px))}
+@media(max-width:600px){
+ .aim-control{left:18px;bottom:36px}.aim-joystick{width:94px;height:94px}
+ .game .utility{left:18px;bottom:162px;flex-direction:row;gap:8px}.game .utility button{height:56px;width:72px}
+ .game .game-hint{bottom:240px;width:85%}
+ .game.left-handed .aim-control{left:auto;right:18px}.game.left-handed .utility{left:auto;right:18px}
+}
+@media(max-height:500px) and (orientation:landscape){
+ .aim-control{left:max(18px,env(safe-area-inset-left));bottom:30px}.aim-joystick{width:84px;height:84px}.joystick-thumb{height:39px;width:39px}
+ .game .utility{left:max(120px,calc(env(safe-area-inset-left) + 105px));bottom:26px;flex-direction:column;gap:6px}.game .utility button{height:44px;width:95px;flex-direction:row;padding:7px;gap:5px}.game .utility button svg{width:17px}.game .utility span{font-size:8px}
+ .game .game-hint{bottom:20px;width:40%;left:53%;font-size:10px}
+ .game.left-handed .aim-control{right:max(18px,env(safe-area-inset-right));left:auto}.game.left-handed .utility{right:max(120px,calc(env(safe-area-inset-right) + 105px));left:auto}
+}

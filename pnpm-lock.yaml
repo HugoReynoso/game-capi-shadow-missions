@@ -11,6 +11,9 @@ importers:
       '@babylonjs/core':
         specifier: ^8.0.0
         version: 8.56.2
+      '@babylonjs/loaders':
+        specifier: 8.56.2
+        version: 8.56.2(@babylonjs/core@8.56.2)(babylonjs-gltf2interface@8.56.2)
       lucide-react:
         specifier: ^0.468.0
         version: 0.468.0(react@19.3.0)
@@ -124,6 +127,12 @@ packages:
 
   '@babylonjs/core@8.56.2':
     resolution: {integrity: sha512-UShs1pt8tSTLYOoITWclXPNrUZUpuHvB2Ur2L1D+uM8c9qaAYOi9gjkurOkQwIlbPGqwQHWImGEyiyix0mQ1dg==}
+
+  '@babylonjs/loaders@8.56.2':
+    resolution: {integrity: sha512-I2klIhTl4HLVVQEMsBpEh5YqbCCi1hA1oajRVCUcy+9Vfh0owzHEGau0GsVRlAOeYEBDNUrfOj0N6nFGTjNQ6g==}
+    peerDependencies:
+      '@babylonjs/core': ^8.0.0
+      babylonjs-gltf2interface: ^8.0.0
 
   '@esbuild/aix-ppc64@0.25.12':
     resolution: {integrity: sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA==}
@@ -474,6 +483,9 @@ packages:
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
 
+  babylonjs-gltf2interface@8.56.2:
+    resolution: {integrity: sha512-c2k14C9mPR0pnfksjBdC4uXEos3t2IAYxcMgn5tI1OSC3aDfr6JAq4kADM4gfN9cUo2qIiDdSg6geUVeU8vi6w==}
+
   baseline-browser-mapping@2.11.23:
     resolution: {integrity: sha512-le521dGVfxM7yRX0EikCoSz+rOK+hHzdDt/E7mG1jOJB/6WAAUuwVroLwaB7ApaUsz5Q0kFlDXLSA9MheUIfRQ==}
     engines: {node: '>=6.0.0'}
@@ -779,6 +791,11 @@ snapshots:
 
   '@babylonjs/core@8.56.2': {}
 
+  '@babylonjs/loaders@8.56.2(@babylonjs/core@8.56.2)(babylonjs-gltf2interface@8.56.2)':
+    dependencies:
+      '@babylonjs/core': 8.56.2
+      babylonjs-gltf2interface: 8.56.2
+
   '@esbuild/aix-ppc64@0.25.12':
     optional: true
 
@@ -998,6 +1015,8 @@ snapshots:
       vite: 6.4.3
     transitivePeerDependencies:
       - supports-color
+
+  babylonjs-gltf2interface@8.56.2: {}
 
   baseline-browser-mapping@2.11.23: {}
 

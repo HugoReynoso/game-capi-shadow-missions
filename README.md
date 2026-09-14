@@ -14,9 +14,9 @@ Su smartphone è consigliata la modalità orizzontale durante la missione. Servo
 
 La missione 01, **Operazione Porto Nero**, è completa: home → operazioni → briefing → porto 3D → vittoria/sconfitta → risultati → salvataggio.
 
-- Porto procedurale con nave, gru, container, casse, magazzino e cinque NPC animati con primitive.
-- Un responsabile con giacca rossa e telefono, due uomini armati e due lavoratori con casco giallo.
-- Mira tramite trascinamento, zoom 1×–4×, sparo dal centro del mirino con raycasting e ostacoli solidi.
+- Porto procedurale con nave, gru, container, casse, magazzino e cinque personaggi animati, con modelli umani GLB, volti e abiti texturizzati.
+- Un responsabile con maglia rossa e telefono, due uomini armati e due lavoratori con casco giallo.
+- Mira tramite tocco, trascinamento, joystick o tastiera, zoom 1×–8×, sparo dal centro del mirino con raycasting e ostacoli solidi.
 - Tre colpi per caricatore; ricarica di 1,8 secondi con munizioni di riserva illimitate nella demo.
 - Respiro stabile per 4 secondi, riutilizzabile dopo 8 secondi dall'attivazione.
 - Docky Scan evidenzia il responsabile per 5 secondi, con recupero di 30 secondi.
@@ -26,14 +26,14 @@ La missione 01, **Operazione Porto Nero**, è completa: home → operazioni → 
 - Equipaggiamento, dossier con le fotografie di riferimento, impostazioni, italiano e inglese.
 - PWA con manifest, icone e service worker; audio sintetizzato via Web Audio.
 
-Le missioni **02–10 sono anteprime bloccate**, non livelli giocabili. Solo **SR-01 Scout** è disponibile. La demo usa NPC e ambienti geometrici: non contiene ancora modelli realistici di Isa e Docky, una simulazione balistica, backend o classifiche.
+Le missioni **02–10 sono anteprime bloccate**, non livelli giocabili. Solo **SR-01 Scout** è disponibile. Il porto usa geometria e texture procedurali, con ombre dinamiche e acqua animata. I personaggi condividono due modelli base: non contiene ancora modelli realistici di Isa e Docky, una simulazione balistica, backend o classifiche.
 
 ## Controlli
 
 | Azione | Touch / mouse | Tastiera |
 | --- | --- | --- |
-| Mirare | Trascina sul porto | — |
-| Zoom | Pulsanti +/− o rotella | Frecce su/giù |
+| Mirare | Tocca un punto, trascina o usa il joystick | WASD / frecce |
+| Zoom | Pizzica, pulsanti +/− o rotella | + / − |
 | Sparare | SPARA | Spazio |
 | Ricaricare | Pulsante munizioni | R |
 | Stabilizzare | RESPIRO | B |
@@ -81,13 +81,19 @@ pnpm build
 src/
   app/App.tsx           Menu, schermate narrative, impostazioni e progressi
   data/missions.ts      Catalogo bilingue delle dieci operazioni
-  game/GameCanvas.tsx   Ciclo missione, HUD, input e controllo camera
-  game/world.ts         Porto, materiali, NPC e animazioni procedurali
+  game/GameCanvas.tsx   HUD React della missione
+  game/world.ts         Porto, illuminazione e assemblaggio della scena
+  game/runtime.ts      Ciclo missione, sparo, pausa e risultati
+  game/aim.ts          Mira touch/mouse/tastiera e zoom
+  game/characters.ts   Modelli GLB, animazioni e collisioni sulle ossa
+  game/surfaces.ts     Texture procedurali
+  game/water.ts        Shader acqua animata
   game/rules.ts         Esiti dei colpi, risultati e calcolo delle stelle
   game/audio.ts         Audio sintetizzato e gestione risorse audio
   services/save.ts      Validazione e salvataggio locale
   styles.css            Interfaccia responsive, HUD e accessibilità
 public/
+  models/               Modelli umani ottimizzati (~4 MB totali)
   images/               Illustrazione e fotografie di Isa e Docky
   manifest.webmanifest  Configurazione PWA
   sw.js                 Cache offline delle risorse visitate
@@ -102,17 +108,17 @@ tests/rules.test.ts      Test delle regole di successo e fallimento
 
 ### Missioni
 
-Aggiungi o modifica i dati in `src/data/missions.ts`. Il catalogo contiene nome, luogo, descrizione, difficoltà, ambiente, disponibilità, durata e ricompensa. Nella demo il runtime di `GameCanvas.tsx` è specifico per la missione 01: per rendere giocabile una nuova missione occorre implementare il relativo mondo, passare la configurazione al runtime e definire le sue condizioni di esito. Non basta cambiare `available`.
+Aggiungi o modifica i dati in `src/data/missions.ts`. Il catalogo contiene nome, luogo, descrizione, difficoltà, ambiente, disponibilità, durata e ricompensa. Nella demo il runtime di `runtime.ts` è specifico per la missione 01: per rendere giocabile una nuova missione occorre implementare il relativo mondo, passare la configurazione al runtime e definire le sue condizioni di esito. Non basta cambiare `available`.
 
 ### NPC e modelli
 
-`src/game/world.ts` contiene la factory `npc()` e il tipo `NPC`: ID, tipo, nodo radice, parti, salute, stato vitale, origine e comportamento. Aggiungi le istanze lì e assegna `metadata.npcId` e `metadata.type` a ogni mesh colpibile. `TARGET`, `HOSTILE` e `CIVILIAN` vengono interpretati da `hitOutcome()`.
+`src/game/characters.ts` carica Remy e SWAT con il loader Babylon glTF. Le cinque istanze hanno scheletri indipendenti, animazione idle e camminata procedurale. Collider invisibili seguono testa, busto e arti; i colpi usano questi collider e gli ostacoli del porto. Se il caricamento fallisce vengono usate primitive di riserva.
 
-Per modelli GLB futuri, aggiungi il loader Babylon compatibile, carica il modello sotto lo stesso nodo radice e conserva i metadata sulle mesh. Mantieni la factory di primitive come fallback se il caricamento fallisce. Il loader GLB non è ancora incluso.
+Provenienza, licenze e adattamenti sono descritti in [Crediti asset](docs/asset-credits.md).
 
 ### Texture
 
-I materiali sono creati dalla funzione `material()` in `world.ts`. Le texture future possono risiedere in `public/textures/`: usa `import.meta.env.BASE_URL` per costruire i percorsi e conserva un colore di fallback. Preferisci texture compresse e dimensioni contenute per smartphone.
+`surfaces.ts` genera texture di cemento, metallo e legno; `water.ts` anima l’acqua. Le texture dei personaggi sono incorporate nei GLB, ridimensionate a massimo 768 pixel.
 
 ### Audio
 
@@ -124,7 +130,7 @@ La schermata equipaggiamento in `App.tsx` mostra tre profili. Le statistiche son
 
 ### Qualità e piattaforme
 
-LOW/MEDIUM/HIGH/AUTO regolano la risoluzione interna; AUTO usa la densità dello schermo, non un benchmark del dispositivo. Le luci sono limitate e non ci sono ombre dinamiche o post-processing pesanti. Il renderer attuale usa WebGL; WebGPU, LOD, pooling e qualità adattiva in base agli FPS restano sviluppi futuri. Il pannello debug e l'accesso alla scena per i test esistono solo in development.
+LOW/MEDIUM/HIGH/AUTO regolano la risoluzione interna; AUTO usa la densità dello schermo, non un benchmark del dispositivo. Le ombre dinamiche sono disattivate in LOW, con mappe da 1024 o 2048 pixel negli altri livelli. Il renderer attuale usa WebGL; WebGPU, LOD e qualità adattiva in base agli FPS restano sviluppi futuri. Il pannello debug e l'accesso alla scena per i test esistono solo in development.
 
 ## Deploy
 
@@ -148,5 +154,6 @@ Per pubblicare alla radice di un altro dominio, modifica `base` in `vite.config.
 - [x] Fase 1 — Prima missione giocabile, UI mobile, risultati e salvataggio.
 - [ ] Fase 2 — Missioni 02–05, configurazione completa del runtime per missione.
 - [ ] Fase 3 — Missioni 06–10 e sblocco progressivo dei livelli implementati.
-- [ ] Fase 4 — Modelli realistici, animazioni, registrazioni audio, WebGPU, ottimizzazioni su dispositivi reali, spagnolo.
+- [x] Personaggi umani GLB, mira libera con joystick e zoom 8×.
+- [ ] Fase 4 — Modelli di Isa e Docky, animazioni avanzate, registrazioni audio, WebGPU, ottimizzazioni su dispositivi reali, spagnolo.
 - [ ] Fase 5 — Backend, account, classifiche e potenziamenti.
