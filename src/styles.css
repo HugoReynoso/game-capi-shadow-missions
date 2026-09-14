@@ -36,3 +36,10 @@
  .game .game-hint{bottom:20px;width:40%;left:53%;font-size:10px}
  .game.left-handed .aim-control{right:max(18px,env(safe-area-inset-right));left:auto}.game.left-handed .utility{right:max(120px,calc(env(safe-area-inset-right) + 105px));left:auto}
 }
+.music-toggle{position:absolute;top:104px;right:24px;z-index:8;display:flex;align-items:center;gap:6px;padding:9px 12px;background:#07151ddd;border:1px solid #52626b;color:#e1e7e9;font-size:10px}
+.shot-feedback{top:26%;left:18px;transform:none;width:180px;display:flex;flex-wrap:wrap;padding:8px;background:#061219ed;border:1px solid #698b88;gap:6px;pointer-events:none}
+.shot-feedback img{width:100%;height:100px;object-fit:cover;border:1px solid #40575b}.shot-feedback span{font-size:10px}.shot-feedback.miss{border-color:#b76d45}
+.incoming-fire{position:absolute;inset:0;z-index:15;pointer-events:none;background:radial-gradient(ellipse,transparent 15%,#ad0923bb 100%);box-shadow:inset 0 0 100px #ff183f;animation:incoming .5s infinite;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;color:white;text-shadow:0 2px 4px black}.incoming-fire strong{font-size:clamp(20px,4vw,42px)}
+@keyframes incoming{50%{box-shadow:inset 0 0 180px #ff183f;background-color:#950b252a}}
+@media(max-height:500px){.music-toggle{top:72px;right:18px}.shot-feedback{top:98px;width:130px}.shot-feedback img{height:65px}}
+@media(max-width:600px) and (orientation:portrait){.music-toggle{top:124px;right:18px}.shot-feedback{top:174px;width:135px}.shot-feedback img{height:76px}}

@@ -1,3 +1,4 @@
+import type {Mission} from '../data/missions';
 import {LoadAssetContainerAsync} from '@babylonjs/core/Loading/sceneLoader';
 import {TransformNode} from '@babylonjs/core/Meshes/transformNode';
 import {Mesh} from '@babylonjs/core/Meshes/mesh';
@@ -27,8 +28,9 @@ const definitions:Array<{id:string;type:NPCType;x:number;z:number}>=[
   {id:'worker-east',type:'CIVILIAN',x:8,z:5},
 ];
 
-export function createCharacters(scene:Scene,shadow:ShadowGenerator|null){
-  const npcs:NPC[]=definitions.map(d=>{
+export function createCharacters(scene:Scene,shadow:ShadowGenerator|null,mission:Mission){
+  const npcs:NPC[]=definitions.map((source,index)=>{
+    const d={...source,type:(index<mission.targets?'TARGET':source.type) as NPCType};d.x+=Math.sin(mission.id*1.7+index)*1.2;d.z+=mission.id%3;
     const root=new TransformNode(d.id,scene);root.position.set(d.x,0,d.z);
     return {...d,root,parts:[],colliders:[],origin:root.position.clone(),health:100,alive:true,behavior:d.type==='TARGET'?'phone':'patrol',animationState:'idle',hitTime:null,groups:[],pose:null,modelLoaded:false,joints:new Map()};
   });
@@ -45,11 +47,11 @@ export function createCharacters(scene:Scene,shadow:ShadowGenerator|null){
   const ready=Promise.all(['remy','swat'].map(name=>LoadAssetContainerAsync(`${import.meta.env.BASE_URL}models/${name}.glb`,scene))).then(containers=>{
     if(scene.isDisposed){containers.forEach(c=>c.dispose());return;}
     for(const n of npcs){
-      const container=containers[n.type==='HOSTILE'?1:0];
+      const container=containers[(n.type==='HOSTILE'||(n.type==='TARGET'&&mission.id>=5))?1:0];
       const instance=container.instantiateModelsToScene(name=>`${n.id}:${name}`,true,{doNotInstantiate:true});
       instance.rootNodes.forEach(node=>{node.parent=n.root;});
-      n.root.scaling.setAll(n.type==='HOSTILE'?1.08:.51);
-      const unit=1/n.root.scaling.x;
+      n.root.scaling.setAll((n.type==='HOSTILE'||(n.type==='TARGET'&&mission.id>=5))?1.08:.51);
+      const unit=1/n.root.scaling.x;if(n.type==='TARGET'&&mission.id<5){n.root.scaling.x*=1.15;n.root.scaling.z*=1.12;}
       n.groups=instance.animationGroups;n.groups.forEach(g=>g.name=`${n.id}:Idle`);
       const descendants=n.root.getChildTransformNodes(false);
       n.joints=new Map(descendants.filter(node=>node.name.includes('mixamorig:')).map(node=>[node.name.split('mixamorig:').at(-1)!,node]));
@@ -59,8 +61,9 @@ export function createCharacters(scene:Scene,shadow:ShadowGenerator|null){
         m.isPickable=false;m.receiveShadows=true;m.alwaysSelectAsActiveMesh=true;
         m.metadata={npcId:n.id,type:n.type};
         if(m.material instanceof PBRMaterial){m.material.roughness=.85;m.material.metallic=.02;m.material.albedoColor=Color3.White();}
+        if(m.material instanceof PBRMaterial&&n.type==='TARGET'&&m.name.includes('Soldier_body'))m.material.albedoColor=Color3.FromHexString(mission.outfit).scale(2.5);
         if(m.material instanceof PBRMaterial && m.name.endsWith('Tops')){
-          m.material.albedoColor=n.type==='TARGET'?new Color3(3,.4,.3):new Color3(2.6,1.85,.3);
+          m.material.albedoColor=n.type==='TARGET'?Color3.FromHexString(mission.outfit).scale(3):new Color3(2.6,1.85,.3);
         }
         n.parts.push(m);
       }
@@ -72,6 +75,17 @@ export function createCharacters(scene:Scene,shadow:ShadowGenerator|null){
       }
       if(n.type==='TARGET'){
         const hand=joint('RightHand');if(hand){const phone=CreateBox('phone',{width:.07*unit,height:.13*unit,depth:.012*unit},scene);phone.parent=hand;phone.position.set(0,.07*unit,.03*unit);phone.material=phoneMat;phone.isPickable=false;n.parts.push(phone);const screen=CreateBox('phone display',{width:.06*unit,height:.11*unit,depth:.001*unit},scene);screen.parent=phone;screen.position.z=-.007*unit;screen.material=screenMat;screen.isPickable=false;n.parts.push(screen);}
+      }
+      if(n.type==='HOSTILE'||(n.type==='TARGET'&&mission.id>1)){
+        const hand=joint('RightHand');
+        if(hand){const rifle=CreateBox('rifle receiver',{width:.09*unit,height:.13*unit,depth:.42*unit},scene);rifle.parent=hand;rifle.position.set(0,.05*unit,.12*unit);rifle.material=phoneMat;rifle.isPickable=false;n.parts.push(rifle);
+        for(const [name,w,h,d,z,y] of [['barrel',.035,.035,.32,.36,0],['stock',.07,.12,.22,-.25,0],['magazine',.06,.18,.08,.04,-.12]] as const){const part=CreateBox(name,{width:w*unit,height:h*unit,depth:d*unit},scene);part.parent=rifle;part.position.set(0,y*unit,z*unit);part.material=phoneMat;part.isPickable=false;n.parts.push(part);}}
+      }
+      if(n.type==='TARGET'){
+        const red=new StandardMaterial(n.id+' identification',scene);red.diffuseColor=Color3.FromHexString('#ff2535');red.emissiveColor=new Color3(.25,0,0);
+        const band=CreateCapsule('red armband',{height:.13*unit,radius:.09*unit,tessellation:12},scene);band.parent=joint('LeftArm')||n.root;band.position.y=.14*unit;band.material=red;band.isPickable=false;n.parts.push(band);
+        if(mission.id===2||mission.id===4){const cap=CreateSphere('gang cap',{diameter:.28*unit,segments:12},scene);cap.parent=joint('Head')||n.root;cap.position.y=.19*unit;cap.scaling.y=.45;cap.material=phoneMat;cap.isPickable=false;n.parts.push(cap);}
+        if(mission.id>=5){const mask=CreateSphere('face covering',{diameter:.24*unit,segments:12},scene);mask.parent=joint('Head')||n.root;mask.position.set(0,.03*unit,.035*unit);mask.scaling.y=.45;mask.material=phoneMat;mask.isPickable=false;n.parts.push(mask);}
       }
       n.modelLoaded=true;
       n.parts.forEach(m=>shadow?.addShadowCaster(m,false));
@@ -89,7 +103,7 @@ export function createCharacters(scene:Scene,shadow:ShadowGenerator|null){
         const elapsed=Math.max(0,time-(n.hitTime??time));const amount=Math.min(1,elapsed/.65);
         n.root.rotation.z=-amount*1.45;n.root.position.y=-.15*amount;return;
       }
-      const phase=(time+i*3.7)%18;
+      const phase=(time*mission.speed+i*3.7)%18;
       const walking=phase<6||phase>=12;
       const progress=phase<6?phase/6:phase<12?1:1-(phase-12)/6;
       const travel=n.type==='TARGET'?1.8:2.2;
@@ -106,7 +120,7 @@ export function createCharacters(scene:Scene,shadow:ShadowGenerator|null){
         group.goToFrame(group.from+(time*.72*fps+i*7)%(Math.max(1,group.to-group.from)));
       }
       if(walking&&n.modelLoaded){
-        const stride=Math.sin(time*5+i*1.8);
+        const stride=Math.sin(time*mission.speed*5+i*1.8);
         const bend=(name:string,angle:number)=>{const joint=n.joints.get(name);if(joint?.rotationQuaternion)joint.rotationQuaternion=joint.rotationQuaternion.multiply(Quaternion.RotationAxis(Vector3.Right(),angle));};
         bend('LeftUpLeg',stride*.32);bend('RightUpLeg',-stride*.32);
         bend('LeftLeg',Math.max(0,-stride)*.4);bend('RightLeg',Math.max(0,stride)*.4);

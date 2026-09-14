@@ -1,3 +1,4 @@
+import type {Mission} from '../data/missions';
 import {Color3,Color4} from '@babylonjs/core/Maths/math.color';
 import {Vector3} from '@babylonjs/core/Maths/math.vector';
 import {Engine} from '@babylonjs/core/Engines/engine';
@@ -19,7 +20,7 @@ import '@babylonjs/core/Rendering/outlineRenderer';
 const MeshBuilder={CreateBox,CreateSphere,CreateDisc};
 import type { Settings } from '../services/save';
 export type {NPC} from './characters';
-export function createWorld(canvas:HTMLCanvasElement,settings:Settings){
+export function createWorld(canvas:HTMLCanvasElement,settings:Settings,mission:Mission){
  const engine=new Engine(canvas,true,{stencil:true,preserveDrawingBuffer:false});
  engine.setHardwareScalingLevel(settings.quality==='LOW'?2:settings.quality==='HIGH'?1:Math.max(1,window.devicePixelRatio/1.5));
  const scene=new Scene(engine);scene.clearColor=new Color4(.035,.065,.095,1);scene.fogMode=Scene.FOGMODE_EXP2;scene.fogDensity=.008;scene.fogColor=new Color3(.055,.095,.13);
@@ -68,7 +69,18 @@ export function createWorld(canvas:HTMLCanvasElement,settings:Settings){
  }
  for(let i=0;i<14;i++)box('concrete joint',-34+i*5,.012,13,.012,.014,40,'#37464d');
  for(let i=0;i<8;i++)box('cross joint',0,.013,-7+i*5,68,.015,.012,'#37464d');
- const characters=createCharacters(scene,shadow);
+ if(mission.environment!=='port'){
+   const hidden=/^(cargo hull|hull stripe|ship deck|bridge|mast|ship freight|crane|gantry|cable|hook|diagonal|water)/;
+   scene.meshes.filter(m=>hidden.test(m.name)).forEach(m=>m.setEnabled(false));
+   box('district ground',0,-.65,65,180,1,100,'#41444a');
+   for(let i=0;i<7;i++){const x=-36+i*12;const h=mission.environment==='city'?12+(i%3)*7:6;box('district building',x,h/2,42,9,h,12,mission.environment==='city'?'#515466':'#595247');for(let y=3;y<h;y+=3)for(let w=-2;w<=2;w+=2)box('district window',x+w,y,35.9,1,1.4,.06,'#aa946c',true);}
+ }
+ if([3,7].includes(mission.id)){
+   for(const x of [-15,16]){box('transport body',x,1.5,17,3,2.5,7,'#555944');for(const z of [14.5,19.5]){box('transport tire',x-1.5,.55,z,.35,1.1,1.1,'#15191a');box('transport tire',x+1.5,.55,z,.35,1.1,1.1,'#15191a');}}
+ }
+ scene.fogDensity=mission.id===8?.018:.006+mission.id*.0004;
+ sky.diffuse=Color3.FromHexString(mission.environment==='city'?'#b7c3e8':mission.environment==='industrial'?'#d4bb92':'#9bc2e8');
+ const characters=createCharacters(scene,shadow,mission);
  const sparks=Array.from({length:8},(_,i)=>{const m=CreateSphere('impact '+i,{diameter:.09,segments:6},scene);m.material=material('#f4d5a2',true);m.isPickable=false;m.setEnabled(false);return {mesh:m,life:0};});
  let impactIndex=0;
  function impact(point:Vector3){const p=sparks[impactIndex++%sparks.length];p.mesh.position.copyFrom(point);p.life=.3;p.mesh.setEnabled(true);}

@@ -12,21 +12,24 @@ Su smartphone è consigliata la modalità orizzontale durante la missione. Servo
 
 ## Cosa puoi giocare
 
-La missione 01, **Operazione Porto Nero**, è completa: home → operazioni → briefing → porto 3D → vittoria/sconfitta → risultati → salvataggio.
+La campagna contiene **10 missioni giocabili**, sbloccate in sequenza. Dopo una vittoria, **Prossima missione** apre il briefing successivo. Stelle e record sono salvati per ogni operazione; i vecchi salvataggi della missione 01 vengono migrati.
 
 - Porto procedurale con nave, gru, container, casse, magazzino e cinque personaggi animati, con modelli umani GLB, volti e abiti texturizzati.
-- Un responsabile con maglia rossa e telefono, due uomini armati e due lavoratori con casco giallo.
+- Avversari con colori di fazione, corporatura più larga nelle prime missioni, cappelli da banda o equipaggiamento tattico, copertura del viso e armi. Gli obiettivi autorizzati hanno una fascia rossa; i civili hanno il casco giallo.
 - Mira tramite tocco, trascinamento, joystick o tastiera, zoom 1×–8×, sparo dal centro del mirino con raycasting e ostacoli solidi.
 - Tre colpi per caricatore; ricarica di 1,8 secondi con munizioni di riserva illimitate nella demo.
 - Respiro stabile per 4 secondi, riutilizzabile dopo 8 secondi dall'attivazione.
-- Docky Scan evidenzia il responsabile per 5 secondi, con recupero di 30 secondi.
-- Colpire il responsabile completa la missione. Colpire qualsiasi altra persona o superare 90 secondi la fa fallire.
+- Docky Scan evidenzia tutti gli obiettivi per 5 secondi, con recupero di 30 secondi.
+- Neutralizza tutti gli obiettivi: da uno a tre, con pattuglie progressivamente più veloci. Colpire civili o guardie senza fascia causa la sconfitta.
+- Il tempo scende da 90 a 45 secondi: alla scadenza, allarme visivo, raffica nemica e sconfitta.
+- Immagine dell’ultimo sparo con indicazione di colpo riuscito/mancato, impatti e caduta dei personaggi.
+- Musica di suspense originale sintetizzata, pulsante MUSIC ON/OFF durante la partita, volumi separati nelle impostazioni e sparo con rumore, attacco e coda grave.
 - Pausa manuale e automatica quando la pagina passa in background.
 - Stelle, miglior tempo, miglior precisione, crediti e impostazioni persistenti in localStorage, con recupero da dati corrotti.
 - Equipaggiamento, dossier con le fotografie di riferimento, impostazioni, italiano e inglese.
 - PWA con manifest, icone e service worker; audio sintetizzato via Web Audio.
 
-Le missioni **02–10 sono anteprime bloccate**, non livelli giocabili. Solo **SR-01 Scout** è disponibile. Il porto usa geometria e texture procedurali, con ombre dinamiche e acqua animata. I personaggi condividono due modelli base: non contiene ancora modelli realistici di Isa e Docky, una simulazione balistica, backend o classifiche.
+Le dieci operazioni sono varianti tattiche su una base di scena condivisa, con scenari portuali, urbani e industriali, posizioni, abiti e parametri differenti. I titoli narrativi non implicano sequenze dedicate di salvataggio ostaggi o inseguimenti. Solo **SR-01 Scout** è disponibile. Il porto usa geometria e texture procedurali, con ombre dinamiche e acqua animata. I personaggi condividono due modelli base. La demo non contiene ancora modelli realistici di Isa e Docky, una simulazione balistica, backend o classifiche.
 
 ## Controlli
 
@@ -47,8 +50,8 @@ Le impostazioni includono sensibilità, volume atmosfera/effetti, vibrazione dov
 - **1 stella:** completa la missione.
 - **2 stelle:** completa con precisione ≥ 60%.
 - **3 stelle:** completa con precisione ≥ 70% in meno di 90 secondi.
-- Colpire una persona diversa dal responsabile provoca sempre la sconfitta.
-- I 1.000 crediti vengono assegnati soltanto al primo completamento. Rigiocare può migliorare stelle e record, senza moltiplicare i crediti.
+- Colpire una persona senza fascia rossa provoca la sconfitta.
+- La ricompensa, da 1.000 a 3.250 crediti, viene assegnata soltanto al primo completamento di ogni missione. Rigiocare può migliorare stelle e record, senza moltiplicare i crediti.
 
 ## Stack e avvio
 
@@ -108,7 +111,7 @@ tests/rules.test.ts      Test delle regole di successo e fallimento
 
 ### Missioni
 
-Aggiungi o modifica i dati in `src/data/missions.ts`. Il catalogo contiene nome, luogo, descrizione, difficoltà, ambiente, disponibilità, durata e ricompensa. Nella demo il runtime di `runtime.ts` è specifico per la missione 01: per rendere giocabile una nuova missione occorre implementare il relativo mondo, passare la configurazione al runtime e definire le sue condizioni di esito. Non basta cambiare `available`.
+`src/data/missions.ts` configura le dieci operazioni: tempo, velocità di pattuglia, numero di obiettivi, ambiente, fazione, colore abiti e ricompensa. App passa la missione selezionata al runtime e al mondo 3D; lo sblocco richiede il completamento della precedente. Per missioni con obiettivi nuovi, estendere il runtime e le condizioni di esito.
 
 ### NPC e modelli
 
@@ -152,8 +155,8 @@ Per pubblicare alla radice di un altro dominio, modifica `base` in `vite.config.
 ## Roadmap
 
 - [x] Fase 1 — Prima missione giocabile, UI mobile, risultati e salvataggio.
-- [ ] Fase 2 — Missioni 02–05, configurazione completa del runtime per missione.
-- [ ] Fase 3 — Missioni 06–10 e sblocco progressivo dei livelli implementati.
+- [x] Fase 2 — Missioni 02–05 e runtime configurabile.
+- [x] Fase 3 — Missioni 06–10 e sblocco progressivo.
 - [x] Personaggi umani GLB, mira libera con joystick e zoom 8×.
 - [ ] Fase 4 — Modelli di Isa e Docky, animazioni avanzate, registrazioni audio, WebGPU, ottimizzazioni su dispositivi reali, spagnolo.
 - [ ] Fase 5 — Backend, account, classifiche e potenziamenti.
