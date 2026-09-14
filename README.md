@@ -147,9 +147,9 @@ Il workflow `.github/workflows/pages.yml` pubblica `dist/` dopo un push su `main
 
 Per pubblicare alla radice di un altro dominio, modifica `base` in `vite.config.ts` in `'/'`. Configura Node 24, comando `npm run build` (dopo installazione) e directory di output `dist`. Non sono presenti API server o variabili segrete necessarie. Dopo aggiornamenti incompatibili della cache, incrementa il nome `CACHE` in `public/sw.js`.
 
-## Riferimenti di Isa e Docky
+## Riferimenti di CAPI e Docky
 
-- [Foto di Isa e Docky al Duomo](docs/references/isa-docky.jpeg): aspetto della protagonista e legame con il cane.
+
 - [Foto di Docky](docs/references/docky.jpg): Labrador color miele, muso chiaro, pettorina rossa.
 - [Concept originale](docs/references/concept.png): direzione artistica iniziale; non uno screenshot del gameplay.
 - [Provenienza e prompt dell'illustrazione](docs/image-generation.md): asset ImageGen creato usando le fotografie come riferimento.
