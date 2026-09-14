@@ -93,7 +93,6 @@ public/
   sw.js                 Cache offline delle risorse visitate
   icon*.png             Icone PWA
   icon.svg              Favicon
-.tests/                 (vedi tests/ nella radice)
 tests/rules.test.ts      Test delle regole di successo e fallimento
 .github/workflows/
   pages.yml             Test, build e deployment automatico
