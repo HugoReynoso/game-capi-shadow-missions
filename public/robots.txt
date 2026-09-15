@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hugoreynoso.github.io/game-capi-shadow-missions/sitemap.xml

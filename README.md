@@ -4,7 +4,7 @@ Una prima demo giocabile di uno sniper game narrativo 3D, mobile-first. Isa, nom
 
 ## Gioca alla demo
 
-**[Apri CAPI: Shadow Missions su GitHub Pages](https://hugoreynoso.github.io/snaiper/)**
+**[Apri CAPI: Shadow Missions su GitHub Pages](https://hugoreynoso.github.io/game-capi-shadow-missions/)**
 
 Su smartphone è consigliata la modalità orizzontale durante la missione. Servono un browser con WebGL e accelerazione hardware. La prima visita richiede una connessione; dopo il caricamento, il service worker conserva le risorse visitate per l'uso offline.
 
@@ -64,7 +64,7 @@ npm install
 npm run dev
 ```
 
-Apri l'indirizzo mostrato da Vite, con percorso `/snaiper/`.
+Apri l'indirizzo mostrato da Vite, con percorso `/game-capi-shadow-missions/`.
 
 ```sh
 npm test
@@ -141,7 +141,7 @@ LOW/MEDIUM/HIGH/AUTO regolano la risoluzione interna; AUTO usa la densità dello
 
 ### GitHub Pages
 
-Il workflow `.github/workflows/pages.yml` pubblica `dist/` dopo un push su `main`, solo se test e build passano. Nelle impostazioni del repository, **Settings → Pages → Source** deve essere **GitHub Actions**. `vite.config.ts` imposta `base: '/snaiper/'` per il repository attuale.
+Il workflow `.github/workflows/pages.yml` pubblica `dist/` dopo un push su `main`, solo se test e build passano. Nelle impostazioni del repository, **Settings → Pages → Source** deve essere **GitHub Actions**. `vite.config.ts` imposta `base: '/game-capi-shadow-missions/'` per il repository attuale.
 
 ### Cloudflare Pages / Netlify
 
