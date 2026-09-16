@@ -1,6 +1,6 @@
 # Illustrazione della home
 
-Asset finale: `public/images/isa-docky-hero.webp`.
+Asset finale: `public/images/docky-hero.webp`.
 
 Generato con il tool ImageGen integrato, usando le fotografie fornite dall'utente come riferimento di Capi e Docky; ottimizzato in WebP per il caricamento mobile. I personaggi 3D della missione sono primitive provvisorie, non modelli ricavati dalle fotografie.
 
