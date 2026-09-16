@@ -1,6 +1,6 @@
 # CAPI: SHADOW MISSIONS
 
-Una prima demo giocabile di uno sniper game narrativo 3D, mobile-first. Isa, nome in codice **CAPI**, e il Labrador color miele **Docky** indagano su un carico sospetto.
+Una prima demo giocabile di uno sniper game narrativo 3D, mobile-first. Nome in codice **CAPI**, e il Labrador color miele **Docky** indagano su un carico sospetto.
 
 ## Gioca alla demo
 
@@ -31,7 +31,7 @@ La campagna contiene **10 missioni giocabili**, sbloccate in sequenza. Dopo una 
 - Equipaggiamento, dossier con le fotografie di riferimento, impostazioni, italiano e inglese.
 - PWA con manifest, icone e service worker; audio sintetizzato via Web Audio.
 
-Le dieci operazioni sono varianti tattiche su una base di scena condivisa, con scenari portuali, urbani e industriali, posizioni, abiti e parametri differenti. I titoli narrativi non implicano sequenze dedicate di salvataggio ostaggi o inseguimenti. Solo **SR-01 Scout** è disponibile. Il porto usa geometria e texture procedurali, con ombre dinamiche e acqua animata. I personaggi condividono due modelli base. La demo non contiene ancora modelli realistici di Isa e Docky, una simulazione balistica, backend o classifiche.
+Le dieci operazioni sono varianti tattiche su una base di scena condivisa, con scenari portuali, urbani e industriali, posizioni, abiti e parametri differenti. I titoli narrativi non implicano sequenze dedicate di salvataggio ostaggi o inseguimenti. Solo **SR-01 Scout** è disponibile. Il porto usa geometria e texture procedurali, con ombre dinamiche e acqua animata. I personaggi condividono due modelli base. La demo non contiene ancora modelli realistici di Docky, una simulazione balistica, backend o classifiche.
 
 ## Controlli
 
@@ -99,7 +99,7 @@ src/
   styles.css            Interfaccia responsive, HUD e accessibilità
 public/
   models/               Modelli umani ottimizzati (~4 MB totali)
-  images/               Illustrazione e fotografie di Isa e Docky
+  images/               Illustrazione e fotografie di Docky
   manifest.webmanifest  Configurazione PWA
   sw.js                 Cache offline delle risorse visitate
   icon*.png             Icone PWA
@@ -160,5 +160,5 @@ Per pubblicare alla radice di un altro dominio, modifica `base` in `vite.config.
 - [x] Fase 2 — Missioni 02–05 e runtime configurabile.
 - [x] Fase 3 — Missioni 06–10 e sblocco progressivo.
 - [x] Personaggi umani GLB, mira libera con joystick e zoom 8×.
-- [ ] Fase 4 — Modelli di Isa e Docky, animazioni avanzate, registrazioni audio, WebGPU, ottimizzazioni su dispositivi reali, spagnolo.
+- [ ] Fase 4 — Modelli di Capi e Docky, animazioni avanzate, registrazioni audio, WebGPU, ottimizzazioni su dispositivi reali, spagnolo.
 - [ ] Fase 5 — Backend, account, classifiche e potenziamenti.
