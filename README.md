@@ -160,5 +160,5 @@ Per pubblicare alla radice di un altro dominio, modifica `base` in `vite.config.
 - [x] Fase 2 — Missioni 02–05 e runtime configurabile.
 - [x] Fase 3 — Missioni 06–10 e sblocco progressivo.
 - [x] Personaggi umani GLB, mira libera con joystick e zoom 8×.
-- [ ] Fase 4 — Modelli di Isa e Docky, animazioni avanzate, registrazioni audio, WebGPU, ottimizzazioni su dispositivi reali, spagnolo.
+- [ ] Fase 4 — Modelli di Capi e Docky, animazioni avanzate, registrazioni audio, WebGPU, ottimizzazioni su dispositivi reali, spagnolo.
 - [ ] Fase 5 — Backend, account, classifiche e potenziamenti.
