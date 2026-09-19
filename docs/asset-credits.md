@@ -12,4 +12,4 @@ A runtime: scheletri indipendenti, tintura degli abiti, caschi, telefono e colli
 
 ## Porto
 
-Geometria, texture di cemento/metallo/legno e shader acqua sono generati dal progetto. Per le immagini di Isa e Docky, vedere [provenienza dell’illustrazione](image-generation.md).
+Geometria, texture di cemento/metallo/legno e shader acqua sono generati dal progetto. Per le immagini di Capi e Docky, vedere [provenienza dell’illustrazione](image-generation.md).

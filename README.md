@@ -8,7 +8,7 @@ Una prima demo giocabile di uno sniper game narrativo 3D, mobile-first. Nome in 
 
 Su smartphone è consigliata la modalità orizzontale durante la missione. Servono un browser con WebGL e accelerazione hardware. La prima visita richiede una connessione; dopo il caricamento, il service worker conserva le risorse visitate per l'uso offline.
 
-![Isa e Docky — illustrazione della home](public/images/docky-hero.webp)
+![Capi e Docky — illustrazione della home](public/images/docky-hero.webp)
 
 ## Cosa puoi giocare
 

@@ -1,4 +1,4 @@
-const CACHE = 'capi-v5-images';
+const CACHE = 'capi-v5-name';
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(['./', './icon.svg', './manifest.webmanifest']))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('capi-') && k !== CACHE).map(k => caches.delete(k))))); self.clients.claim(); });
 self.addEventListener('fetch', event => {
